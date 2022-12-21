@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SarcLibrary", "src/SarcLibrary.csproj", "{1F651418-E6C1-4F52-B184-E691607CC9E9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SarcLibrary", "src\SarcLibrary.csproj", "{1F651418-E6C1-4F52-B184-E691607CC9E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{5F9879E1-09EA-43EC-9A87-7F73275A7ED4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmark", "Benchmark\Benchmark.csproj", "{56BDFBEE-D3A1-4688-8C8F-E01F1327BA3D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{1F651418-E6C1-4F52-B184-E691607CC9E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F651418-E6C1-4F52-B184-E691607CC9E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F651418-E6C1-4F52-B184-E691607CC9E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F9879E1-09EA-43EC-9A87-7F73275A7ED4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F9879E1-09EA-43EC-9A87-7F73275A7ED4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F9879E1-09EA-43EC-9A87-7F73275A7ED4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F9879E1-09EA-43EC-9A87-7F73275A7ED4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56BDFBEE-D3A1-4688-8C8F-E01F1327BA3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56BDFBEE-D3A1-4688-8C8F-E01F1327BA3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56BDFBEE-D3A1-4688-8C8F-E01F1327BA3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56BDFBEE-D3A1-4688-8C8F-E01F1327BA3D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
