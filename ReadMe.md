@@ -1,4 +1,4 @@
-﻿# SarcLibrary
+# SarcLibrary
 
 Nintendo **S**EAD **Arc**hive Library | Based on [oead/sarc](https://github.com/zeldamods/oead/blob/master/src/sarc.cpp) by [Léo Lam](https://github.com/leoetlino)
 
