@@ -42,7 +42,7 @@ namespace SarcLibrary
                 count.SwapEndian();
             }
 
-            Span<(uint, int, int, int)> nodes = stackalloc (uint, int, int, int)[count];
+            Span<(uint Hash, int StringOffset, int DataStart, int DataEnd)> nodes = stackalloc (uint, int, int, int)[count];
 
             for (int i = 0; i < count; i++) {
                 uint hash = reader.ReadUInt32();
@@ -69,24 +69,24 @@ namespace SarcLibrary
                 Span<byte> stringTableBuffer = reader.ReadBytes((int)(dataOffset - stream.Position)).AsSpan();
                 for (int i = 0; i < count; i++) {
                     if (i == count - 1) {
-                        Add(Encoding.UTF8.GetString(stringTableBuffer[nodes[i].Item2..]).Replace(Null, Empty),
-                           reader.ReadBytes(nodes[i].Item4 - nodes[i].Item3));
+                        Add(Encoding.UTF8.GetString(stringTableBuffer[nodes[i].StringOffset..]).Replace(Null, Empty),
+                           reader.ReadBytes(nodes[i].DataEnd - nodes[i].DataStart));
                     }
                     else {
-                        Add(Encoding.UTF8.GetString(stringTableBuffer[nodes[i].Item2..nodes[i + 1].Item2]).Replace(Null, Empty),
-                           reader.ReadBytes(nodes[i].Item4 - nodes[i].Item3));
-                        stream.Seek(nodes[i + 1].Item3 - nodes[i].Item4, SeekOrigin.Current);
+                        Add(Encoding.UTF8.GetString(stringTableBuffer[nodes[i].StringOffset..nodes[i + 1].StringOffset]).Replace(Null, Empty),
+                           reader.ReadBytes(nodes[i].DataEnd - nodes[i].DataStart));
+                        stream.Seek(nodes[i + 1].DataStart - nodes[i].DataEnd, SeekOrigin.Current);
                     }
                 }
             }
             else {
                 stream.Seek(dataOffset, SeekOrigin.Begin);
                 for (int i = 0; i < count; i++) {
-                    byte[] buffer = reader.ReadBytes(nodes[i].Item4 - nodes[i].Item3);
-                    Add($"{nodes[i].Item1:x8}.{GuessFileExtension(buffer)}", buffer);
+                    byte[] buffer = reader.ReadBytes(nodes[i].DataEnd - nodes[i].DataStart);
+                    Add($"{nodes[i].Hash:x8}.{GuessFileExtension(buffer)}", buffer);
 
                     if (i != count - 1) {
-                        stream.Seek(nodes[i + 1].Item3 - nodes[i].Item4, SeekOrigin.Current);
+                        stream.Seek(nodes[i + 1].DataStart - nodes[i].DataEnd, SeekOrigin.Current);
                     }
                 }
             }
@@ -129,7 +129,7 @@ namespace SarcLibrary
             // Allocate sorted keys/values
             string[] fileNames = Keys.ToArray();
             uint[] keys = new uint[Count];
-            (string, int, int, int, int)[] nodes = new (string, int, int, int, int)[Count];
+            (string FileName, int DataStart, int DataEnd, int StringOffset, int Alignment)[] nodes = new (string, int, int, int, int)[Count];
 
             int relStringOffset = 0;
             int relDataOffset = 0;
@@ -162,9 +162,9 @@ namespace SarcLibrary
 
             for (int i = 0; i < Count; i++) {
                 writer.Write(keys[i].AsUInt32(Endian));
-                writer.Write(HashOnly ? 0x00 : (0x01000000 | nodes[i].Item4).AsInt32(Endian));
-                writer.Write(nodes[i].Item2.AsInt32(Endian));
-                writer.Write(nodes[i].Item3.AsInt32(Endian));
+                writer.Write(HashOnly ? 0x00 : (0x01000000 | nodes[i].DataEnd).AsInt32(Endian));
+                writer.Write(nodes[i].DataStart.AsInt32(Endian));
+                writer.Write(nodes[i].DataStart.AsInt32(Endian));
             }
 
             // Write string table (SFNT)
@@ -173,7 +173,7 @@ namespace SarcLibrary
             writer.Write((ushort)0x00);
 
             for (int i = 0; i < Count; i++) {
-                byte[] buffer = Encoding.UTF8.GetBytes(nodes[i].Item1);
+                byte[] buffer = Encoding.UTF8.GetBytes(nodes[i].FileName);
                 byte[] aligned = new byte[buffer.Length + 4 & -4];
                 Array.Copy(buffer, aligned, buffer.Length);
                 writer.Write(aligned);
@@ -185,8 +185,8 @@ namespace SarcLibrary
 
             // Write data
             for (int i = 0; i < Count; i++) {
-                stream.Align(nodes[i].Item5);
-                writer.Write(this[nodes[i].Item1]);
+                stream.Align(nodes[i].Alignment);
+                writer.Write(this[nodes[i].FileName]);
             }
 
             int fileSize = (int)stream.Position;
