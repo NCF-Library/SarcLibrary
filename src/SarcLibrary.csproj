@@ -2,19 +2,18 @@
 
 	<PropertyGroup>
         <Copyright>(c) exelix, Syroot, GingerAvalanche, and KillzXGaming, licensed under GPL-3.0-or-later</Copyright>
-		<TargetFramework>net5.0</TargetFramework>
-		<TargetFrameworks>net5.0;net6.0</TargetFrameworks>
+		<TargetFramework>net7.0</TargetFramework>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<Authors>exelix and Syroot. (Updated by ArchLeaders)</Authors>
-		<Description>Updated version of exelix's SarcLibrary</Description>
-		<PackageProjectUrl>https://github.com/ArchLeaders/NCF-Library/tree/master/SarcLibrary</PackageProjectUrl>
+		<Authors>Arch Leaders</Authors>
+		<Description>Nintendo SEAD Archive Library | Based on oead/sarc by Léo Lam</Description>
+		<PackageProjectUrl>https://github.com/NCF-Library/SarcLibrary</PackageProjectUrl>
 		<PackageIcon>icon.png</PackageIcon>
-		<RepositoryUrl>https://github.com/ArchLeaders/NCF-Library/tree/master/SarcLibrary</RepositoryUrl>
+		<RepositoryUrl>https://github.com/NCF-Library/SarcLibrary</RepositoryUrl>
 		<PackageTags>sarc;archive;botw;nintendo;zelda</PackageTags>
 		<PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<VersionPrefix>1.0.6</VersionPrefix>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -29,10 +28,6 @@
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Syroot.BinaryData" Version="5.2.2" />
 	</ItemGroup>
 
 </Project>
