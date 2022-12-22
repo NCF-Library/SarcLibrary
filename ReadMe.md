@@ -81,6 +81,21 @@ _Benchmarks run on an [`AMD Ryzen 7 3700X`](https://www.amd.com/en/products/cpu/
 Exceptions to every file being parsed and re-written byte-perfectly are a the sbeventpack archives in `content/Event`, which seems to use a mix of alignments. During tests, I found offsets of 0x100 and 0x8 that had varying reliability.<br>
 These odd occurrences are also ignored in `oead/sarc`. Luckily, the game does not seem to care if these files are aligned to 4-bytes, so the error is not detrimental (at least not in BOTW).
 
+### Install
+
+[![NuGet](https://img.shields.io/nuget/v/SarcLibrary.svg)](https://www.nuget.org/packages/SarcLibrary) [![NuGet](https://img.shields.io/nuget/dt/SarcLibrary.svg)](https://www.nuget.org/packages/SarcLibrary)
+
+#### NuGet
+```powershell
+Install-Package SarcLibrary
+```
+
+#### Build From Source
+```batch
+git clone https://github.com/NCF-Library/SarcLibrary.git
+dotnet build SarcLibrary
+```
+
 ## Credit
 
 - **[ArchLeaders](https://github.com/ArchLeaders)**: Optimized C# SARC implementation based on oead by [Léo Lam](https://github.com/leoetlino)
