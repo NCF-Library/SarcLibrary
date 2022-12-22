@@ -17,7 +17,9 @@ SarcFile sarc = SarcFile.FromBinary("content/Pack/Bootup.pack");
 // Read from a byte[]
 // Do not use with File.ReadAllBytes(), use
 // a Stream instead.
-SarcFile sarc = SarcFile.FromBinary(data);
+SarcFile sarc = SarcFile.FromBinary("content/Pack/Bootup.pack");
+byte[] decompressedData = Yaz0.Decompress(sarc["GameData/gamedata.ssarc"]);
+SarcFile nestedSarc = SarcFile.FromBinary(decompressedData);
 ```
 
 ```cs
@@ -35,8 +37,6 @@ sarc.ToBinary("content/Pack/Bootup.pack");
 
 ```cs
 // Write to a byte[]
-// Not advised unless the byte[] is required, consider
-// using a MemoryStream with the next example instead.
 byte[] data = sarc.ToBinary();
 ```
 
