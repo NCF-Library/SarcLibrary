@@ -162,9 +162,9 @@ namespace SarcLibrary
 
             for (int i = 0; i < Count; i++) {
                 writer.Write(keys[i].AsUInt32(Endian));
-                writer.Write(HashOnly ? 0x00 : (0x01000000 | nodes[i].DataEnd).AsInt32(Endian));
+                writer.Write(HashOnly ? 0x00 : (0x01000000 | nodes[i].StringOffset).AsInt32(Endian));
                 writer.Write(nodes[i].DataStart.AsInt32(Endian));
-                writer.Write(nodes[i].DataStart.AsInt32(Endian));
+                writer.Write(nodes[i].DataEnd.AsInt32(Endian));
             }
 
             // Write string table (SFNT)
