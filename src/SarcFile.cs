@@ -129,28 +129,11 @@ namespace SarcLibrary
             // Allocate sorted keys/values
             string[] fileNames = Keys.ToArray();
             uint[] keys = new uint[Count];
-            (string FileName, int DataStart, int DataEnd, int StringOffset, int Alignment)[] nodes = new (string, int, int, int, int)[Count];
-
-            int relStringOffset = 0;
-            int relDataOffset = 0;
-            int fileAlignment = 1;
             for (int i = 0; i < Count; i++) {
-                string fileName = fileNames[i];
-                keys[i] = GetHash(fileName);
-
-                // Calculate data and string offsets
-                Span<byte> buffer = this[fileName].AsSpan();
-                int alignment = GetFileAlignment(fileName, buffer, this);
-                int dataStart = relDataOffset.Align(alignment);
-                int dataEnd = dataStart + buffer.Length;
-                nodes[i] = (fileName, dataStart, dataEnd, relStringOffset / 4, alignment);
-
-                relDataOffset = dataEnd;
-                relStringOffset += fileName.Length + 4 & -4;
-                fileAlignment = LCM(fileAlignment, alignment);
+                keys[i] = GetHash(fileNames[i]);
             }
 
-            Array.Sort(keys, nodes);
+            Array.Sort(keys, fileNames);
 
             stream.Seek(0x14, SeekOrigin.Begin);
 
@@ -160,11 +143,28 @@ namespace SarcLibrary
             writer.Write(Count.AsInt16(Endian));
             writer.Write(HashKey.AsUInt32(Endian));
 
+            Span<int> alignments = stackalloc int[Count];
+            int relStringOffset = 0;
+            int relDataOffset = 0;
+            int fileAlignment = 1;
             for (int i = 0; i < Count; i++) {
+                string fileName = fileNames[i];
+
+                // Calculate data and string offsets
+                Span<byte> buffer = this[fileName].AsSpan();
+                int alignment = GetFileAlignment(fileName, buffer, this);
+                int dataStart = relDataOffset.Align(alignment);
+                int dataEnd = dataStart + buffer.Length;
+                alignments[i] = alignment;
+
                 writer.Write(keys[i].AsUInt32(Endian));
-                writer.Write(HashOnly ? 0x00 : (0x01000000 | nodes[i].StringOffset).AsInt32(Endian));
-                writer.Write(nodes[i].DataStart.AsInt32(Endian));
-                writer.Write(nodes[i].DataEnd.AsInt32(Endian));
+                writer.Write((HashOnly ? 0x00 : (0x01000000 | (relStringOffset / 4))).AsInt32(Endian));
+                writer.Write(dataStart.AsInt32(Endian));
+                writer.Write(dataEnd.AsInt32(Endian));
+
+                relDataOffset = dataEnd;
+                relStringOffset += (fileName.Length + 4) & -4;
+                fileAlignment = LCM(fileAlignment, alignment);
             }
 
             // Write string table (SFNT)
@@ -173,7 +173,7 @@ namespace SarcLibrary
             writer.Write((ushort)0x00);
 
             for (int i = 0; i < Count; i++) {
-                byte[] buffer = Encoding.UTF8.GetBytes(nodes[i].FileName);
+                byte[] buffer = Encoding.UTF8.GetBytes(fileNames[i]);
                 byte[] aligned = new byte[buffer.Length + 4 & -4];
                 Array.Copy(buffer, aligned, buffer.Length);
                 writer.Write(aligned);
@@ -185,8 +185,8 @@ namespace SarcLibrary
 
             // Write data
             for (int i = 0; i < Count; i++) {
-                stream.Align(nodes[i].Alignment);
-                writer.Write(this[nodes[i].FileName]);
+                stream.Align(alignments[i]);
+                writer.Write(this[fileNames[i]]);
             }
 
             int fileSize = (int)stream.Position;
@@ -196,7 +196,7 @@ namespace SarcLibrary
             writer.Write(0x14.AsInt16(Endian));
             writer.Write((ushort)Endian);
             writer.Write(fileSize.AsInt32(Endian));
-            writer.Write(dataOffset.AsInt32(Endian)); // Data offset (0x0C)
+            writer.Write(dataOffset.AsInt32(Endian));
             writer.Write(0x0100.AsInt16(Endian)); // SARC Version
             writer.Write((ushort)0x00); // Reserved
         }
@@ -215,7 +215,7 @@ namespace SarcLibrary
             SarcFile sarc = new();
             foreach (var file in Directory.GetFiles(directory, searchPattern, searchOption)) {
                 byte[] data = File.ReadAllBytes(file);
-                string name = Path.GetRelativePath(directory, file).Replace(Path.PathSeparator, '/');
+                string name = Path.GetRelativePath(directory, file).Replace('\\', '/');
                 sarc.Add(name, operation?.Invoke(name, data) ?? data);
             }
 

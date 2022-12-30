@@ -188,7 +188,7 @@ namespace SarcLibrary
 
         public static int Align(this int value, int alignment)
         {
-            return value + (alignment - value % alignment) % alignment;
+            return value + ((alignment - value % alignment) % alignment);
         }
 
         [GeneratedRegex("[^a-zA-Z0-9 -]")]
