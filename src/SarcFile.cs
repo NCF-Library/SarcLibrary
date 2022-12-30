@@ -201,7 +201,7 @@ namespace SarcLibrary
             writer.Write((ushort)0x00); // Reserved
         }
 
-        public Task ExtractToDirectory(string outputDirectory, Func<string, byte[], byte[]>? operation)
+        public Task ExtractToDirectory(string outputDirectory, Func<string, byte[], byte[]>? operation = null)
         {
             return Parallel.ForEachAsync(this, async (sarcFile, cancellationToken) => {
                 string file = Path.Combine(outputDirectory, sarcFile.Key[0] == '/' ? sarcFile.Key.Remove(0, 1) : sarcFile.Key);
