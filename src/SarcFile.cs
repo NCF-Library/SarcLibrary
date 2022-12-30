@@ -201,21 +201,12 @@ namespace SarcLibrary
             writer.Write((ushort)0x00); // Reserved
         }
 
-        public async Task ExtractToDirectory(string outputDirectory)
+        public Task ExtractToDirectory(string outputDirectory, Func<string, byte[], byte[]>? operation)
         {
-            if (HashOnly) {
-                Directory.CreateDirectory(outputDirectory);
-            }
-
-            await Parallel.ForEachAsync(this, async (sarcFile, cancellationToken) => {
-                if (!HashOnly) {
-                    string file = Path.Combine(outputDirectory, sarcFile.Key);
-                    Directory.CreateDirectory(Path.GetDirectoryName(file) ?? "");
-                    await File.WriteAllBytesAsync(file, sarcFile.Value, cancellationToken);
-                }
-                else {
-                    await File.WriteAllBytesAsync(Path.Combine(outputDirectory, sarcFile.Key), sarcFile.Value, cancellationToken);
-                }
+            return Parallel.ForEachAsync(this, async (sarcFile, cancellationToken) => {
+                string file = Path.Combine(outputDirectory, sarcFile.Key[0] == '/' ? sarcFile.Key.Remove(0, 1) : sarcFile.Key);
+                Directory.CreateDirectory(Path.GetDirectoryName(file) ?? "");
+                await File.WriteAllBytesAsync(file, operation?.Invoke(sarcFile.Key, sarcFile.Value) ?? sarcFile.Value, cancellationToken);
             });
         }
 
