@@ -213,8 +213,8 @@ namespace SarcLibrary
         public static SarcFile LoadFromDirectory(string directory, string searchPattern = "*.*", SearchOption searchOption = SearchOption.AllDirectories)
         {
             SarcFile sarc = new();
-            foreach (var file in Directory.EnumerateFiles(directory, searchPattern, searchOption)) {
-                sarc.Add(Path.GetRelativePath(directory, file), File.ReadAllBytes(file));
+            foreach (var file in Directory.GetFiles(directory, searchPattern, searchOption)) {
+                sarc.Add(Path.GetRelativePath(directory, file).Replace(Path.PathSeparator, '/'), File.ReadAllBytes(file));
             }
 
             return sarc;
