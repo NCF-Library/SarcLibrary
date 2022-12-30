@@ -210,11 +210,13 @@ namespace SarcLibrary
             });
         }
 
-        public static SarcFile LoadFromDirectory(string directory, string searchPattern = "*.*", SearchOption searchOption = SearchOption.AllDirectories)
+        public static SarcFile LoadFromDirectory(string directory, Func<string, byte[], byte[]>? operation = null, string searchPattern = "*.*", SearchOption searchOption = SearchOption.AllDirectories)
         {
             SarcFile sarc = new();
             foreach (var file in Directory.GetFiles(directory, searchPattern, searchOption)) {
-                sarc.Add(Path.GetRelativePath(directory, file).Replace(Path.PathSeparator, '/'), File.ReadAllBytes(file));
+                byte[] data = File.ReadAllBytes(file);
+                string name = Path.GetRelativePath(directory, file).Replace(Path.PathSeparator, '/');
+                sarc.Add(name, operation?.Invoke(name, data) ?? data);
             }
 
             return sarc;
