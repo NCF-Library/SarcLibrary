@@ -16,6 +16,7 @@ namespace Tests
         public async Task CheckAllFiles(string key, string root)
         {
             List<string> failed = new();
+            string resDir = Directory.CreateDirectory($"D:\\Bin\\SarcLibrary\\{key}\\").FullName;
 
             await Parallel.ForEachAsync(Directory.EnumerateFiles(root, "*.*", SearchOption.AllDirectories), async (file, cancellationToken) => {
                 byte[] data = await File.ReadAllBytesAsync(file, cancellationToken);
@@ -35,12 +36,19 @@ namespace Tests
                     byte[] sarcData = sarc.ToBinary();
                     if (!Enumerable.SequenceEqual(data, sarcData)) {
                         failed.Add($"{file}: {data.Length} did not match {sarcData.Length}.");
+                        if (failed.Count <= 25) {
+                            File.WriteAllBytes($"{Path.Combine(resDir, Path.GetFileNameWithoutExtension(file))}.failed{Path.GetExtension(file)}", sarcData);
+                            File.WriteAllBytes(Path.Combine(resDir, Path.GetFileName(file)), data);
+                        }
+                        else {
+                            throw new Exception();
+                        }
                     }
                 }
             });
 
             if (failed.Any()) {
-                File.WriteAllLines($"F:\\Bin\\{key}\\_fail_list.txt", failed);
+                File.WriteAllLines($"{resDir}\\_fail_list.txt", failed);
                 throw new InternalTestFailureException();
             }
         }
