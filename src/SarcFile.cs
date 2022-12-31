@@ -179,7 +179,6 @@ namespace SarcLibrary
                 writer.Write(aligned);
             }
 
-            // Console.WriteLine(string.Join(", ", nodes.Select(x => x.Item4)));
             stream.Align(fileAlignment);
             int dataOffset = (int)stream.Position;
 
